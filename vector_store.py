@@ -9,6 +9,11 @@ import ollama
 import chromadb
 from langchain_community.document_loaders import PDFPlumberLoader, Docx2txtLoader
 import uuid
+import utils
+
+if not utils.pull_ollama_embed_model():
+    utils.force_pull_ollama_embed_model
+
 
 PERSIST_DIRECTORY = "./VectorStore"
 EMBED_MODEL = "nomic-embed-text"
@@ -82,7 +87,7 @@ def store_text_to_vector_db(text, collection_name):
 
     return f"Data successfully added to collection: {collection_name}"
 
-def query_vector_store(prompt, collection_name, n_results=10):
+def query_vector_store(prompt, collection_name, n_results=5):
     collection = persistent_client.get_or_create_collection(collection_name)
 
     # Generating embedding for query
@@ -109,9 +114,19 @@ template = """Use the following context to answer the question. If you don’t k
 Question: {question}
 Answer:"""
 
+# def get_answer(question, collection_name, temperature=0.1):
+#     context = ", ".join(query_vector_store(question, collection_name))
+#     return generate_response(template.format(context=context, question=question))
+
 def get_answer(question, collection_name, temperature=0.1):
-    context = ", ".join(query_vector_store(question, collection_name))
-    return generate_response(template.format(context=context, question=question))
+    context_docs = query_vector_store(question, collection_name)
+    context = " ".join(context_docs[0]) if context_docs else ""
+    template = "Use the following context to answer the question. If you don't know the answer, say you don't know.\nContext: {context}\nQuestion: {question}\nAnswer:"
+    return ollama.generate(
+        model=model, 
+        prompt=template.format(context=context, question=question)
+        # temperature=temperature
+    )['response']
 
 def interface():
     with gr.Blocks() as ui:

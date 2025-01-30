@@ -10,10 +10,12 @@ def pull_ollama_embed_model(model_name: str = "nomic-embed-text"):
         os.system(f"ollama pull {model_name}")
     else:
         print(f"Model {model_name} is already available locally.")
+    return True
 
 def force_pull_ollama_embed_model(model_name: str = "nomic-embed-text"):
     print(f"Force pulling model {model_name}...")
     os.system(f"ollama pull {model_name}")
+    return True
 
 from langchain_community.document_loaders import WikipediaLoader
 
