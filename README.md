@@ -1,3 +1,6 @@
+![image](https://github.com/user-attachments/assets/0a1e9ba9-0c65-46ee-bb58-52448af88b23)
+
+
 # **VectorMind** 🚀  
 **100% Locally Running AI-Powered Knowledge Retrieval System**  
 
